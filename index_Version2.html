@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>رفيق التعافي الذكي</title>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Font: Tajawal -->
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    body { font-family: 'Tajawal', sans-serif; background-color: #f8fafc; }
+    .chat-container { height: 250px; overflow-y: auto; display: flex; flex-direction: column; }
+    .user-msg { background: #dbeafe; align-self: flex-start; padding: 8px; border-radius: 8px; margin: 5px 0; max-width: 80%; }
+    .ai-msg { background: #f1f5f9; align-self: flex-end; padding: 8px; border-radius: 8px; margin: 5px 0; max-width: 80%; border: 1px solid #e2e8f0; }
+  </style>
+</head>
+<body class="bg-gray-100 pb-10">
+
+<nav class="bg-blue-600 text-white p-4 shadow-lg mb-6">
+  <h1 class="text-xl font-bold text-center">🌱 رفيق التعافي</h1>
+</nav>
+
+<div class="max-w-md mx-auto px-4">
+  <div class="bg-white p-4 rounded-xl shadow-sm mb-4 border-r-4 border-blue-500">
+    <h2 class="text-sm font-bold text-blue-600 mb-1">المانيفستو اليومي:</h2>
+    <p id="manifesto-display" class="text-gray-700 italic">"قراري اليوم أقوى من رغبتي المؤقتة، أنا أستحق الحرية."</p>
+  </div>
+
+  <div class="bg-white rounded-xl shadow-md overflow-hidden mb-6">
+    <div class="bg-gray-800 text-white p-3 text-sm font-bold flex justify-between">
+      <span>💬 المرشد الذكي</span>
+      <span class="text-green-400">● متصل</span>
+    </div>
+    <div id="chat-box" class="chat-container p-4">
+      <div class="ai-msg text-sm">مرحباً بك.. أنا معك دائماً. كيف تشعر الآن؟</div>
+    </div>
+    <div class="p-2 border-t flex">
+      <input type="text" id="user-input" placeholder="اكتب شعورك هنا..." class="flex-1 p-2 border rounded-r-lg outline-none text-sm">
+      <button onclick="sendMessage()" class="bg-blue-600 text-white px-4 rounded-l-lg text-sm font-bold">إرسال</button>
+    </div>
+  </div>
+
+  <div class="bg-white p-5 rounded-xl shadow-md mb-6">
+    <h2 class="font-bold mb-4 border-b pb-2">📋 روتين التعافي اليومي</h2>
+    <div class="space-y-4">
+      <label class="flex items-center justify-between cursor-pointer">
+        <span>😴 نوم كافٍ ومبكر</span>
+        <input id="check-1" type="checkbox" class="w-6 h-6 rounded text-blue-600" onchange="saveChecks()">
+      </label>
+      <label class="flex items-center justify-between cursor-pointer">
+        <span>🏃 حركة (مشي أو رياضة)</span>
+        <input id="check-2" type="checkbox" class="w-6 h-6 rounded text-blue-600" onchange="saveChecks()">
+      </label>
+      <label class="flex items-center justify-between cursor-pointer">
+        <span>🧠 تركيز (عمل أو تعلم)</span>
+        <input id="check-3" type="checkbox" class="w-6 h-6 rounded text-blue-600" onchange="saveChecks()">
+      </label>
+    </div>
+  </div>
+
+  <button onclick="triggerEmergency()" class="w-full bg-red-500 text-white py-4 rounded-xl font-bold shadow-lg hover:bg-red-600 transition duration-300">
+    🆘 أنا في خطر (لحظة اشتعال)
+  </button>
+</div>
+
+<script>
+  // Simple chat interactions
+  function sendMessage() {
+    const input = document.getElementById('user-input');
+    const chatBox = document.getElementById('chat-box');
+    if (!input.value.trim()) return;
+
+    chatBox.innerHTML += `<div class="user-msg text-sm">${escapeHtml(input.value)}</div>`;
+
+    let reply = "أنا أسمعك.. تذكر أن الشعور ليس حقيقة، هو مجرد سحابة وستمر.";
+    const val = input.value;
+    if (val.includes("تعبان") || val.includes("ضعيف")) reply = "لا بأس بالضعف، المهم ألا تستسلم. تنفس بعمق 5 مرات الآن.";
+    if (val.includes("فخور") || val.includes("نجحت")) reply = "هذا هو بطلنا! استمر، كل يوم هو انتصار جديد.";
+
+    setTimeout(() => {
+      chatBox.innerHTML += `<div class="ai-msg text-sm">${reply}</div>`;
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }, 600);
+
+    input.value = "";
+  }
+
+  function triggerEmergency() {
+    alert("⚠️ تنبيه: اترك هاتفك الآن، اخرج من الغرفة، اشرب ماءً بارداً. أنت أقوى من هذه اللحظة!");
+  }
+
+  // LocalStorage for checkboxes
+  function saveChecks() {
+    const checks = [
+      document.getElementById('check-1').checked,
+      document.getElementById('check-2').checked,
+      document.getElementById('check-3').checked
+    ];
+    try {
+      localStorage.setItem('recovery-checks', JSON.stringify(checks));
+      console.log("Progress saved locally.");
+    } catch (e) {
+      console.warn("Could not save to localStorage:", e);
+    }
+  }
+
+  function loadChecks() {
+    try {
+      const stored = JSON.parse(localStorage.getItem('recovery-checks') || '[]');
+      if (Array.isArray(stored)) {
+        document.getElementById('check-1').checked = !!stored[0];
+        document.getElementById('check-2').checked = !!stored[1];
+        document.getElementById('check-3').checked = !!stored[2];
+      }
+    } catch (e) {
+      console.warn("Could not load checks:", e);
+    }
+  }
+
+  // basic XSS-escaping for chat messages
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.innerText = text;
+    return div.innerHTML;
+  }
+
+  // Initialize on load
+  document.addEventListener('DOMContentLoaded', () => {
+    loadChecks();
+  });
+</script>
+
+</body>
+</html>
